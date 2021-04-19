@@ -1,115 +1,157 @@
-from collections import OrderedDict
-import numpy as np
+class Node(object):
+    """An instance of a node of a doubly-linked list. """
+
+    def __init__(self, val):
+        self.prev = None
+        self.next = None
+        self.val = val  # (key,value) pair
+
+    def get_key(self):
+        return self.val[0]
+
+    def get_val(self):
+        return self.val[1]
 
 
 class LRU_Cache(object):
+    """LRU Cache implemented using a Hash Map (python dictionary) and a Doubly Linked List. """
 
     def __init__(self, capacity):
-        # Initialize class variables
-        self.cache = OrderedDict()
-        try:
-            assert capacity >= 1
-            self.capacity = capacity
-        except Exception:
-            raise ValueError("Capacity must be positive")
+        self.capacity = capacity  # max capacity of the LRU cache
+        self.cache = dict()  # a Hash Map to store the key-valued pairs
+
+        # init head and tail of a doubly linked list
+        self.head = None  # the most recently accessed key
+        self.tail = None  # the least recently accessed key
 
     def get(self, key):
         # Retrieve item from provided key. Return -1 if nonexistent.
-        try:
-            value = self.cache[key]  # get the value
-            self.cache.move_to_end(key)  # the "end" is really our "front", as the most recently used key
-            return value
-        except KeyError:
-            return -1  # in case the key is not there, then we return -1 as requested
+        if key not in self.cache.keys():
+            return -1
+
+        # If the key is the most recently occurring one, return the value, do not change Doubly-Linked List
+        if self.cache[key].next is None:
+            return self.cache[key].get_val()
+
+        # Here, we need to update the order in which elements are accessed
+        if self.cache[key].prev:  # is not None
+            self.cache[key].prev.next = self.cache[key].next
+        else:  # prev is None, so the given key is at Tail position, update tail
+            self.tail = self.cache[key].next
+
+        self.cache[key].next.prev = self.cache[key].prev
+
+        # put the recently access node at the head position
+        self.cache[key].prev = self.head
+        self.head.next = self.cache[key]
+        self.head = self.cache[key]
+        self.head.next = None
+
+        return self.cache[key].get_val()
 
     def set(self, key, value):
         # Set the value if the key is not present in the cache. If the cache is at capacity remove the oldest item.
 
-        # if the key is there, we have to pop it out of ordered dict, and add it again with a new value
-        try:
-            self.cache.pop(key)
+        if self.capacity <= 0 or type(self.capacity) != int:
+            print(f"LRU cache capacity is {self.capacity} and cannot hold any information.")
+            return
 
-        except KeyError:  # the key is not present, check for the size, and append a new key to ordered dict
-            if len(self.cache) >= self.capacity:
-                self.cache.popitem(last=False)  # FIFO removal (the oldest one)
+        # If the KEY is in the dictionary, we don't need to worry about LRU_cache capacity, just re-order items
+        if key in self.cache.keys():
 
-        finally:  # append a key-value pair to the ordered dict
-            self.cache[key] = value
+            # if KEY is already most recently accessed one, replace value and finish
+            if self.cache[key].next is None:
+                self.cache[key].val = (key, value)
+                return
+
+            # Extract the node, and replace its value
+            tmp_node = self.cache[key]
+            tmp_node.val = (key, value)
+
+            if tmp_node.prev:  # is not None
+                tmp_node.prev.next = tmp_node.next
+            else:  # tmp_node is a tail
+                self.tail = tmp_node.next
+
+            tmp_node.next.prev = tmp_node.prev
+            tmp_node.next = None  # most recent node does not have a next Node
+            self.head.next = tmp_node  # moves the head
+            self.head = tmp_node
+
+            return
+
+        # The key is not present, we need to check capacity: remove least recently used entry first
+        if self.capacity == len(self.cache):
+            del self.cache[self.tail.get_key()]
+            self.tail = self.tail.next
+
+        tmp_node = Node((key, value))
+
+        # If we initialize, we put a value in the hash map and set the head equal to tail tail,
+        if len(self.cache) == 0:
+            self.head = self.tail = self.cache[key] = tmp_node
+            return
+
+        # At this point we know we have space left in the LRU cache, and need to insert it and update the latest node
+        # update the most recent entry
+        tmp_node.prev = self.head
+        self.head.next = tmp_node
+        self.head = tmp_node
+        # and add it to the HashMap
+        self.cache[key] = self.head
 
 
-if __name__ == '__main__':
-    
-    """Edge case #1, an LRU cache with capacity of 1.
-    In such a case we can only store one element
-    """
-    single_LRU = LRU_Cache(1)
-    single_LRU.set(1, 1)
-    single_LRU.set(2, 2)
+if __name__ == "__main__":
+    ### Test 1 : LRU cache with capacity of 1
+    print("--- Test #1")
+    lru = LRU_Cache(1)
 
-    try:
-        assert single_LRU.get(1) == -1
-        assert single_LRU.get(2) == 2
-        assert single_LRU.get(123) == -1
-        single_LRU.set(3, 3)
-        assert single_LRU.get(2) == -1
-        assert single_LRU.get(3) == 3
-    except Exception:
-        raise Exception("Case #1 failed")
+    lru.set(1, 1)
+    lru.set(10, 10)
 
-    print("Case #1 passed")
+    print(lru.get(1))
+    # -1
+    print(lru.get(10))
+    # 10
 
-    """Case #2: big random input to equally big LRU cache
-    
-    First insert every random int to the LRU cache, as key-value pairs.
-    Next set the values to the square of itself. 
-    Then make sure each key retrieved from the LRU squared is equal to value.
-    
-    This makes sure the setting is done correctly. 
-    """
-    
-    random_inputs = np.arange(0, 1e6)  # million integers from 0 to one million-1 ...
-    np.random.shuffle(random_inputs)  # ... randomly shuffled
+    ### TEST 2 : LRU without any storage capacity
+    print("--- Test #2")
+    lru = LRU_Cache(0)
 
-    big_LRU = LRU_Cache(len(random_inputs))
+    lru.set(1, 1)
+    print(lru.get(1))
+    # LRU cache capacity is 0 and cannot hold any information.
+    # -1
 
-    for random_input in random_inputs:
-        big_LRU.set(random_input, random_input)
+    ### TEST 3: a simple size-limited LRU cache
+    print("--- Test #3")
+    lru = LRU_Cache(3)
 
-    for random_input in random_inputs:
-        big_LRU.set(random_input, random_input**2)
+    for i in range(0, 10):
+        lru.set(i, i)
 
-    for random_input in random_inputs:
-        try:
-            assert big_LRU.get(random_input) == random_input**2
-        except Exception:
-            raise Exception("Case #2 test failed for random input")
+    print(lru.get(2))
+    # -1
+    print(lru.get(7))
+    # 7
 
-    print("Case #2 passed")  # prints: case #2 passed
+    ### TEST 4: access order test
+    print("--- TEST 4")
+    lru = LRU_Cache(10)
 
-    """Case #3: 
-    Creates a thousand of random integers from 0 to 1000. Adds them in order to a LRU cache of size 100. 
-    Asserts that only last 100 entries are matching the random inputs, all else have -1 (not present)
-    
-    """
+    # set items from 0 to 9
+    for i in range(0, 10):
+        lru.set(i, i)
 
-    random_inputs2 = np.arange(0, 1e3)  # thousand integers from 0 to one million-1 ...
-    np.random.shuffle(random_inputs2)  # ... randomly shuffled
+    # access items from 9 to 0
+    for i in range(9, -1, -1):
+        lru.get(i)
 
-    limited_LRU = LRU_Cache(100)
+    # exceed the LRU capacity by 2 elements
+    lru.set(100, 100)
+    lru.set(200, 200)
 
-    for random_input2 in random_inputs2:
-        limited_LRU.set(random_input2, random_input2)
-
-    for random_input2 in random_inputs2[:-100]:  # all but last one hundred give "-1"
-        try:
-            assert limited_LRU.get(random_input2) == -1
-        except Exception:
-            raise Exception("Case #3 failed")
-
-    for random_input2 in random_inputs2[-100:]:
-        try:
-            assert limited_LRU.get(random_input2) == random_input2
-        except Exception:
-            raise Exception("Case #3 failed")
-
-    print("Case #3 passed")
+    print(lru.get(9))
+    # -1
+    print(lru.get(0))
+    # 0
