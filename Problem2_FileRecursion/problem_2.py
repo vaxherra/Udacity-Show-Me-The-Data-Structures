@@ -39,13 +39,14 @@ def find_files(suffix, path):
     pass
 
 if(__name__ == "__main__"):
+    print("Please unzip the 'testdirs' archive with folders ")
 
     # TEST #1 : provided testdir
-    print(find_files(".c","testdir"))
+    print(find_files(".c","testdirs/testdir"))
     # ['testdir/subdir3/subsubdir1/b.c', 'testdir/t1.c', 'testdir/subdir5/a.c', 'testdir/subdir1/a.c']
 
     # TEST #2: empty directory
-    print(find_files(suffix=".py", path="testdir2"))
+    print(find_files(suffix=".py", path="testdirs/testdir2"))
     # []
 
     # TEST #3: non-existing directory
@@ -53,5 +54,5 @@ if(__name__ == "__main__"):
     # []
 
     # TEST #4: custom test dir with .py files
-    print(find_files(".py", "testdir3"))
+    print(find_files(".py", "testdirs/testdir3"))
     # ['testdir3/hello.py', 'testdir3/f4/hello.py', 'testdir3/f4/hello3.py', 'testdir3/f4/hello2.py']
