@@ -1,5 +1,6 @@
 import os
 
+
 def find_files(suffix, path):
     """
     Find all files beneath path with file name suffix.
@@ -17,7 +18,7 @@ def find_files(suffix, path):
        a list of paths
     """
 
-    ### First obtain a list of files and dirs in provided path
+    # First obtain a list of files and dirs in provided path
     try:
         files_dirs = os.listdir(path)
     except FileNotFoundError:  # path does not exist
@@ -28,7 +29,7 @@ def find_files(suffix, path):
         else:
             return []
 
-    ### Loop over the list of files/dirs in "path"
+    # Loop over the list of files/dirs in "path"
     return_list = []
     for f in files_dirs:
         return_list += find_files(suffix, f"{path}/{f}")
@@ -36,13 +37,11 @@ def find_files(suffix, path):
     return return_list
 
 
-    pass
-
-if(__name__ == "__main__"):
+if __name__ == "__main__":
     print("Please unzip the 'testdirs' archive with folders ")
 
     # TEST #1 : provided testdir
-    print(find_files(".c","testdirs/testdir"))
+    print(find_files(".c", "testdirs/testdir"))
     # ['testdir/subdir3/subsubdir1/b.c', 'testdir/t1.c', 'testdir/subdir5/a.c', 'testdir/subdir1/a.c']
 
     # TEST #2: empty directory
