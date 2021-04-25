@@ -95,9 +95,10 @@ if __name__ == "__main__":
 
     ss_group1.add_group(sss_group1)
     s_group1.add_group(ss_group1)
-    # Then add group2 as a sub sub group 1
-    ss_group1.add_group(group2)
+    # Then add s_group2 as a sub sub group 1
+    ss_group1.add_group(s_group2)
     group1.add_group(s_group1)
 
     # Test if group 1 contains "sss group 2 user"
     print(is_user_in_group("sss group 2 user", group1))  # True
+    print(is_user_in_group("group 2 user", group1))  # False
