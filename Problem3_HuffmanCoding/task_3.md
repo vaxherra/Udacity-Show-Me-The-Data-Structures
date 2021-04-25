@@ -78,7 +78,8 @@ If a leaf node is encountered, append the (alphabetical) character of the leaf n
 You will have to implement the logic for both encoding and decoding in the following template. Also, you will need to create the sizing schemas to present a summary.
    
 
-```import sys
+```python
+import sys
 
 def huffman_encoding(data):
     pass
