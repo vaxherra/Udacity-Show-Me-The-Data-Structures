@@ -134,7 +134,7 @@ if __name__ == "__main__":
     print(intersection(linked_list_3, linked_list_4))  # "" (empty linked list)
 
     # Test case #3
-    print("Test Case #3: intersection of an empty and non-empty list is an empty list:")
+    print("Test Case #3 (edge case): intersection of an empty and non-empty list is an empty list:")
 
     empty = LinkedList()
     nonEmpty = LinkedList()
@@ -159,3 +159,14 @@ if __name__ == "__main__":
     [one.append(i) for i in range(0,200)]
 
     print(intersection(one,one).size() == union(one,one).size())  # True
+
+    # Test case #6 (edge case)
+    print("Test Case #6 (edge case): two empty lists, intersection and union is an empty list")
+
+    l1 = LinkedList()
+    l2 = LinkedList()
+
+    print(intersection(l1,l2))  # "" - empty string
+    print(union(l1,l2))  # "" - empty string
+
+
