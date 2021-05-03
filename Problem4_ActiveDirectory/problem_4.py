@@ -62,7 +62,7 @@ if __name__ == "__main__":
     emptyGroup = Group("Empty Group")
     print(is_user_in_group("No user", emptyGroup))  # False
 
-    # Test 3: Combining two groups of gorups in a hierarchical manner, and testing if newly added group contains a user
+    # Test 3: Combining two groups of groups in a hierarchical manner, and testing if newly added group contains a user
     print("---\nTest#3")
 
     # First: Create two nested groups
@@ -102,3 +102,13 @@ if __name__ == "__main__":
     # Test if group 1 contains "sss group 2 user"
     print(is_user_in_group("sss group 2 user", group1))  # True
     print(is_user_in_group("group 2 user", group1))  # False
+
+    # TEST #4 (edge case). A user not in group
+    print("Test#4")
+    # utilize previous group1 and group 2 structures
+    external_user = "external user"
+    group3 = Group("Group #3")
+    group3.add_user(external_user)
+
+    print(is_user_in_group(external_user,group1))  # False
+    print(is_user_in_group(external_user, group2))  # False
