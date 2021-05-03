@@ -52,7 +52,7 @@ class LRU_Cache(object):
     def set(self, key, value):
         # Set the value if the key is not present in the cache. If the cache is at capacity remove the oldest item.
 
-        if self.capacity <= 0 or type(self.capacity) != int:
+        if type(self.capacity) != int or self.capacity <= 0 :
             print(f"LRU cache capacity is {self.capacity} and cannot hold any information.")
             return
 
@@ -114,7 +114,7 @@ if __name__ == "__main__":
     print(lru.get(10))
     # 10
 
-    ### TEST 2 : LRU without any storage capacity
+    ### TEST 2 (edge case): LRU without any storage capacity
     print("--- Test #2")
     lru = LRU_Cache(0)
 
@@ -155,3 +155,23 @@ if __name__ == "__main__":
     # -1
     print(lru.get(0))
     # 0
+
+    ### TEST 5 (edge case): negative capacity
+    print("--- TEST 5")
+    lru = LRU_Cache(-10)
+
+    lru.set(1,10)
+    print(lru.get(1))
+    # LRU cache capacity is -10 and cannot hold any information.
+    # -1
+
+    ### TEST 6 (edge case): None capacity
+    print("--- TEST 6")
+    lru = LRU_Cache(None)
+
+    lru.set(1, 10)
+    print(lru.get(1))
+    # LRU cache capacity is None and cannot hold any information.
+    # -1
+
+
