@@ -102,6 +102,10 @@ def huffman_encoding(data):
     """Huffman encoding: given a string, outputs a tuple of encoded data, and a binary Huffman tree used to
     decode the data"""
 
+    # if data is empty or None
+    if data is None or len(data)==0:
+        return "",LeafNode("",1)
+
     # Building frequency table (dict)
     frequencies = dict()
     for char in data:  # O(n): n - number of input characters
@@ -128,6 +132,9 @@ def huffman_encoding(data):
 def huffman_decoding(data, tree):
     """Given encoded data and a binary Huffman tree used to encode the data, outputs a string containing
     the decoded data."""
+
+    if(data==""):  # empty encoded string, means a single character was encoded, and tree is just a single leaf
+        return tree.char * tree.freq
 
     decoded_data = ""
     curr_node = tree
@@ -203,3 +210,24 @@ if __name__ == "__main__":
     print("The size of the encoded data is: {}\n".format(sys.getsizeof(int(encoded_data, base=2))))  # random number
     print("The size of the decoded data is: {}\n".format(sys.getsizeof(decoded_data)))  # 1000049
     print(data == decoded_data)  # True
+
+    # TEST 4: edge case: an empty string
+    print("-"*10)
+    print("Test #4")
+
+    data = ""  # an empty string
+    encoded_data, tree = huffman_encoding(data)
+    decoded_data = huffman_decoding(data,tree)
+    print(decoded_data)  # "", an empty string
+    print(decoded_data == data)  # True
+
+    # TEST 5: edge case: a single repetitive character
+    print("-"*10)
+    print("Test #5")
+
+    data = "A"*10
+    encoded_data,tree = huffman_encoding(data)
+    decoded_data = huffman_decoding(encoded_data,tree)
+
+    print(encoded_data)  # "AAAAAAAAAA"
+    print(decoded_data == data)  # True
